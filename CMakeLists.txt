@@ -5,6 +5,7 @@ include_directories(include)
 
 add_library(YetAnotherArchive
     src/api.cpp
+    src/Archive.cpp
 )
 
 add_executable(testexe test.cpp)

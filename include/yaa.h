@@ -3,12 +3,14 @@
 #ifndef YET_ANOTHER_ARCHIVE_H_
 #define YET_ANOTHER_ARCHIVE_H_
 
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-typedef void* YAAFile; /** an archive */
-typedef struct YAAData YAAData; /** data to be added to or saved in the archive */
+typedef void* YAA_Archive; /** an archive */
+typedef struct YAA_Data YAA_Data; /** data to be added to or saved in the archive */
 
 /** Apart from the creation, all API calls return this enum */
 enum YAA_RESULT {
@@ -17,7 +19,7 @@ enum YAA_RESULT {
     YAA_RESULT_WARN     = -1
 };
 
-struct YAAData {
+struct YAA_Data {
     void * data; /** data contained in the blob */
     size_t size; /** number of bytes in this data blob */
     int end;     /** is this the last blob in a file */
@@ -29,7 +31,7 @@ struct YAAData {
  * 
  * @returns a new archive 
  */
-extern YAAFile YAA_new();
+extern YAA_Archive YAA_new();
 
 
 /** Frees the memory of an existing archive
@@ -39,7 +41,7 @@ extern YAAFile YAA_new();
  *      YAA_RESULT_ERROR if the pointer is void or if an exception was raised
  *      YAA_RESULT_SUCCESS if the memory was freed normally
  */
-extern enum YAA_RESULT YAA_delete(YAAFile yaa);
+extern enum YAA_RESULT YAA_delete(YAA_Archive yaa);
 
 
 /** Loads an existing archive from disk
@@ -52,7 +54,7 @@ extern enum YAA_RESULT YAA_delete(YAAFile yaa);
  *      YAA_RESULT_WARN file was loaded but the signature did not match
  *      YAA_RESULT_SUCCESS file was loaded and signature matched or public_key is NULL
  */
-extern enum YAA_RESULT YAA_load(YAAFile yaa, const char * filename, const char * public_key);
+extern enum YAA_RESULT YAA_load(YAA_Archive yaa, const char * filename, const char * public_key);
 
 
 /** Saves archive to disk
@@ -64,7 +66,7 @@ extern enum YAA_RESULT YAA_load(YAAFile yaa, const char * filename, const char *
  *      YAA_RESULT_ERROR an exception was raised
  *      YAA_RESULT_SUCCESS file was saved and signed
  */
-extern enum YAA_RESULT YAA_save(YAAFile yaa, const char * filename, const char * private_key);
+extern enum YAA_RESULT YAA_save(YAA_Archive yaa, const char * filename, const char * private_key);
 
 // add data
 // add meta
