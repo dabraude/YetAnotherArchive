@@ -8,5 +8,10 @@ int main() {
     std::cout << "Test delete: " << result << "\n";
 
 
+    yaa = YAA_new();
+    result = YAA_save(yaa, "test.yaa", 0);
+    YAA_delete(yaa);
+    std::cout << "Test save an empty file: " << result << "\n";
+
     return 0;
 }

@@ -68,11 +68,15 @@ extern enum YAA_RESULT YAA_load(YAA_Archive yaa, const char * filename, const ch
  */
 extern enum YAA_RESULT YAA_save(YAA_Archive yaa, const char * filename, const char * private_key);
 
+// get YAA_Data
 // add data
 // add meta
 // encrypt data
 // compress data
 // data recovery
+// remove file
+// append file
+// status
 
 #ifdef __cplusplus
 }

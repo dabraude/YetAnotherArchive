@@ -49,6 +49,12 @@ Each files entry looks like this:
 
 The `metadata`, `encryption`, `compression`, and `recorvery` fields are optional but if included can be used to store anything needed to read the file in your system.
 
+
+
+## Building
+
+init & build the submodules (cJSON &  )
+
 This will be updated if I think of anything else.
 
 

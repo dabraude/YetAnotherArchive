@@ -2,10 +2,13 @@ cmake_minimum_required(VERSION 3.0.0)
 project(YetAnotherArchive VERSION 0.1.0)
 
 include_directories(include)
+include_directories(src)
+
 
 add_library(YetAnotherArchive
     src/api.cpp
     src/Archive.cpp
+    src/io/ArchiveWriter.cpp
 )
 
 add_executable(testexe test.cpp)

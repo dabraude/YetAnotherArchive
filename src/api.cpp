@@ -32,3 +32,23 @@ enum YAA_RESULT YAA_delete(YAA_Archive yaa)
         return YAA_RESULT_ERROR;
     }
 }
+
+
+/** Saves archive to disk */
+extern enum YAA_RESULT YAA_save(YAA_Archive yaa, const char * filename, const char * private_key) 
+{
+    if (!yaa)
+    {
+        return YAA_RESULT_ERROR;
+    }
+
+    try
+    {
+        auto yaa_arc = reinterpret_cast<YAA::Archive*>(yaa);
+        return yaa_arc->save(filename, private_key);
+    }
+    catch(const std::exception& e)
+    {
+        return YAA_RESULT_ERROR;
+    }
+}

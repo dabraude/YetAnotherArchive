@@ -1,18 +1,17 @@
 /** Copyright David Braude 2019 */
+#ifndef SRC_ARCHIVE_HPP_
+#define SRC_ARCHIVE_HPP_
 
 #include "yaa.h"
 
 namespace YAA {
-
 class Archive {
     /** The implementation of the Archive parts of the API
      * 
      */
 
 public:
-    /** Loads an existing archive from disk
-     *
-     * Implementation of YAA_load
+    /** Implementation of YAA_load
      * 
      * @see YAA_load
      * 
@@ -25,8 +24,18 @@ public:
      */
     enum YAA_RESULT load(const char * filename, const char * public_key);
 
-
+    /** Implementation of YAA_save
+     * 
+     * @see YAA_save
+     * 
+     * @param filename the name of the file where to save the archive
+     * @param private_key your private key for signing the file
+     * @returns results of attempting to save
+     *      YAA_RESULT_ERROR an exception was raised
+     *      YAA_RESULT_SUCCESS file was saved and signed
+     */
+    enum YAA_RESULT save(const char * filename, const char * private_key);
 };
+}
 
-
-};
+#endif // SRC_ARCHIVE_HPP_
