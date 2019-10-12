@@ -2,6 +2,9 @@
 #ifndef SRC_ARCHIVE_HPP_
 #define SRC_ARCHIVE_HPP_
 
+#include <fstream>
+#include <string>
+
 #include "yaa.h" /* for enum YAA_RESULT */
 
 namespace YAA {
@@ -11,20 +14,56 @@ class Archive {
      */
 
 public:
-    /** Implementation of YAA_load
+    /** Create a new empty archive
      * 
-     * @see YAA_load
+     * Allocates the appropraite memory, under the hood this returns a pointer to an object
      * 
-     *  @param filename the name of the file load
-     *  @param public_key your public key for checking the creator signature (or NULL)
+     * @see YAA_new
+     * 
+     * @param filename the name of the archive to edit
+     * @returns a new archive 
+     */
+    Archive(const char * filename);
+
+    /** Destructor
+     * 
+     * will close the archive if it is open
+     */
+    ~Archive();
+
+    /** Opens an archive for editing
+     * 
+     *  @see YAA_open
+     *
      *  @returns results of attempting to load
-     *      YAA_RESULT_ERROR an exception was raised or the integraty check failed
-     *      YAA_RESULT_WARN file was loaded but the signature did not match
-     *      YAA_RESULT_SUCCESS file was loaded and signature matched or public_key is NULL
+     *      YAA_RESULT_ERROR an exception was raised or the integrity check failed
+     *      YAA_RESULT_WARN file was already open
+     *      YAA_RESULT_SUCCESS file was opened and signature matched or hmac_public_key is NULL
      */
     enum YAA_RESULT open();
 
+    /** Closes an open archive
+     *
+     *  @see YAA_close
+     * 
+     *  @returns results of attempting to close
+     *      YAA_RESULT_ERROR an exception was raised
+     *      YAA_RESULT_WARN the file was already closed
+     *      YAA_RESULT_SUCCESS file was closed successfully
+     */
+    enum YAA_RESULT close();
 
+    /** Returns if an archive is open
+     * 
+     * @see YAA_is_open
+     * 
+     * @returns true if open
+     */
+    bool is_open();
+
+protected:
+    const std::string _filename;
+    std::fstream _file;
 };
 }
 

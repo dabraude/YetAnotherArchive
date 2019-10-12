@@ -20,8 +20,8 @@ enum YAA_RESULT {
  *
  * Allocates the appropraite memory, under the hood this returns a pointer to an object
  * 
- * @param filename the name of the file load
- * @returns a new archive 
+ * @param filename the name of the archive to edit
+ * @returns a new archive or null if there is a problem
  */
 extern YAA_Archive YAA_new(const char * filename);
 
@@ -39,25 +39,42 @@ extern enum YAA_RESULT YAA_delete(YAA_Archive yaa);
 /** Opens an archive for editing
  *
  *  @param yaa the archive object to store the loaded info
- *  @param hmac_public_key your public key for checking the creator signature (or NULL)
  *  @returns results of attempting to load
  *      YAA_RESULT_ERROR an exception was raised or the integrity check failed
- *      YAA_RESULT_WARN file was opened but the signature did not match
+ *      YAA_RESULT_WARN if the file was already open
  *      YAA_RESULT_SUCCESS file was opened and signature matched or hmac_public_key is NULL
  */
 extern enum YAA_RESULT YAA_open(YAA_Archive yaa);
 
 
-// TODO functions:
+/** Closes an open archive
+ *
+ *  @param yaa the archive object to store the loaded info
+ *  @returns results of attempting to close
+ *      YAA_RESULT_ERROR an exception was raised
+ *      YAA_RESULT_WARN the file was already closed
+ *      YAA_RESULT_SUCCESS file was closed successfully
+ */
+extern enum YAA_RESULT YAA_close(YAA_Archive yaa);
 
-// YAA_add_object
-// YAA_remove_object
-// YAA_retrieve_object
-// YAA_verify_creator
-// YAA_sign
+/** Check if an archive is open
+ *
+ *  @param yaa the archive object to store the loaded info
+ *  @returns 1 if open
+ */
+int YAA_is_open(YAA_Archive yaa);
 
+// TODOs
 
+// functions:
+//  YAA_add_object
+//  YAA_remove_object
+//  YAA_retrieve_object
+//  YAA_verify_creator
+//  YAA_sign
 
+// general
+//  mutex locking for write operations
 
 #ifdef __cplusplus
 }
