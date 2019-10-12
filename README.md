@@ -18,11 +18,10 @@ Format specification (`%d` is an integer in ascii `\0` is null termination):
   * Start of the file small header = `YAA_MAGIC_STRING|%d\0` 
     - The integer is the file format number
   
-  * End of file (in order from the back:
-    - 32 characters are the MD5 hash of the entire file except the last the hash itself written in Ascii
-    - A string of the form `\0%d\0` : the size of the creator signature (can be zero if there won't be a signature)
-    - The creator signature - Either `HMAC-RIPEMD-160` over everything up to here or ommited if the creator signature size is 0. 
-    - A string of the form `\0%d\0` : the size of the header in ASCII
+  * End of file (in order from the back, hashes are written in lower case ascii):
+    - 32 characters are the `MD5` hash of the entire file other than the last 96 characters
+    - 64 the size of the creator signature `HMAC-RSA-SHA256` or 0s for unsigned files, the hash covering the file other than the last 96 characters
+    - A string of the form `\0%d\0` : the size of the file info JSON in ascii
     - The file info JSON
     
    * The header (a JSON):
@@ -39,16 +38,17 @@ Each files entry looks like this:
 ```json
         {
           "name":"file name",
-          "size" : %d,
+          "size" : 0,
           "metadata":{},
           "encryption":{},
           "compression":{},
           "recovery":{}
          }
 ```
-
+Obviously the `name` and `size` need to be replaced as appropriate.
 The `metadata`, `encryption`, `compression`, and `recorvery` fields are optional but if included can be used to store anything needed to read the file in your system.
 
+The `MD5` hash show be used for only for an integrity of the data check since it is faster to compute `SHA256`. 
 
 
 ## Building
