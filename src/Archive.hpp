@@ -2,7 +2,7 @@
 #ifndef SRC_ARCHIVE_HPP_
 #define SRC_ARCHIVE_HPP_
 
-#include "yaa.h"
+#include "yaa.h" /* for enum YAA_RESULT */
 
 namespace YAA {
 class Archive {
@@ -22,19 +22,9 @@ public:
      *      YAA_RESULT_WARN file was loaded but the signature did not match
      *      YAA_RESULT_SUCCESS file was loaded and signature matched or public_key is NULL
      */
-    enum YAA_RESULT load(const char * filename, const char * public_key);
+    enum YAA_RESULT open();
 
-    /** Implementation of YAA_save
-     * 
-     * @see YAA_save
-     * 
-     * @param filename the name of the file where to save the archive
-     * @param private_key your private key for signing the file
-     * @returns results of attempting to save
-     *      YAA_RESULT_ERROR an exception was raised
-     *      YAA_RESULT_SUCCESS file was saved and signed
-     */
-    enum YAA_RESULT save(const char * filename, const char * private_key);
+
 };
 }
 

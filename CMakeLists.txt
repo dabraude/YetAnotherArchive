@@ -5,11 +5,12 @@ include_directories(include)
 include_directories(src)
 
 
-add_library(YetAnotherArchive
-    src/api.cpp
+set(sources
     src/Archive.cpp
-    src/io/ArchiveWriter.cpp
+    src/yaa.cpp
 )
+
+add_library(YetAnotherArchive ${sources})
 
 add_executable(testexe test.cpp)
 target_link_libraries(testexe YetAnotherArchive)
