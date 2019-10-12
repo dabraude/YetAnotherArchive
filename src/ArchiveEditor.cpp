@@ -11,7 +11,7 @@ enum YAA_RESULT ArchiveEditor::write_new(Archive * archive)
     bool was_open = archive->is_open();
     
     // delete the old file first
-    clear_content(archive);
+    _clear_content(archive);
 
     
     
@@ -24,7 +24,7 @@ enum YAA_RESULT ArchiveEditor::write_new(Archive * archive)
 }
 
 
-void ArchiveEditor::clear_content(Archive * archive)
+void ArchiveEditor::_clear_content(Archive * archive)
 {
     (void) archive->close();
     std::ofstream file;

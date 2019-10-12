@@ -36,7 +36,7 @@ protected:
     // _sign_document();
 
     /** Clears the content of an archive completely */
-    void clear_content(Archive * archive);
+    void _clear_content(Archive * archive);
 
 };
 }
