@@ -9,6 +9,9 @@
 
 namespace YAA {
 
+#define YAA_NUM_SIGNATURE_CHARACTERS 64
+#define YAA_NUM_HASH_CHARACTERS 32
+
 extern const char ARCHIVE_MAGIC_STRING[];
 
 class Archive {
@@ -43,7 +46,7 @@ public:
      *      YAA_RESULT_WARN file was already open
      *      YAA_RESULT_SUCCESS file was opened and signature matched or hmac_public_key is NULL
      */
-    enum YAA_RESULT open(const char * mode);
+    enum YAA_RESULT open(bool read_only);
 
     /** Closes an open archive
      *
@@ -72,15 +75,10 @@ public:
 
 protected:
     const std::string _filename;
-    std::ios_base::openmode  _mode;
+    bool  _read_only;
     std::fstream _file;
 
-    /** Determines the access mode based on the mode string
-     * 
-     * @param mode the access mode string
-     * @returns the file stream access mode
-     */
-    std::ios_base::openmode _determine_write_mode(const char * mode);
+
 };
 }
 

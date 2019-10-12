@@ -3,6 +3,8 @@
 #ifndef YET_ANOTHER_ARCHIVE_H_
 #define YET_ANOTHER_ARCHIVE_H_
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -39,13 +41,13 @@ extern enum YAA_RESULT YAA_delete(YAA_Archive yaa);
 /** Opens an archive for editing
  *
  *  @param yaa the archive to store the loaded info
- *  @param mode the mode in which to open the file, "w", "r", or "a"
+ *  @param read_only if true then editing of the file is not allowed
  *  @returns results of attempting to load
  *      YAA_RESULT_ERROR an exception was raised or the integrity check failed
  *      YAA_RESULT_WARN if the file was already open
  *      YAA_RESULT_SUCCESS file was opened and signature matched or hmac_public_key is NULL
  */
-extern enum YAA_RESULT YAA_open(YAA_Archive yaa, const char * mode);
+extern enum YAA_RESULT YAA_open(YAA_Archive yaa, bool read_only);
 
 
 /** Closes an open archive

@@ -10,6 +10,7 @@ set(sources
     src/Archive.cpp
     src/ArchiveEditor.cpp
     src/yaa.cpp
+    src/utils.cpp
 )
 
 add_library(YetAnotherArchive ${sources})

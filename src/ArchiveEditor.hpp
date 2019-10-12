@@ -28,15 +28,15 @@ public:
 
 
 protected:
-    // _write_magic_string();
+    /** Writes the magic string at the start of the file in the file stream */
+    void _write_magic_string(std::fstream& archive_file);
+    
     // _write_header();
     // _write_blank_signature();
     // _write_integrity_hash();
 
     // _sign_document();
 
-    /** Clears the content of an archive completely */
-    void _clear_content(Archive * archive);
 
 };
 }

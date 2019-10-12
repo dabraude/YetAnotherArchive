@@ -9,7 +9,7 @@ int main() {
 
 
     yaa = YAA_new("test.yaa");
-    result = YAA_open(yaa, "w");
+    result = YAA_open(yaa, false);
     YAA_delete(yaa);
     std::cout << "Test open a new file: " << result << "\n";
 
