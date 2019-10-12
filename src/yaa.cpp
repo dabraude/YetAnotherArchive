@@ -26,14 +26,17 @@
 }                                                                                   \
 
 // The functions
-enum YAA_RESULT YAA_open(YAA_Archive yaa)   
-    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, open);
+enum YAA_RESULT YAA_open(YAA_Archive yaa, const char * mode)   
+    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, open, mode);
 
 enum YAA_RESULT YAA_close(YAA_Archive yaa)
     C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, close);
 
 int YAA_is_open(YAA_Archive yaa)
     C_API_ARCHIVE_CALL(yaa, int, false, is_open);
+
+const char * YAA_filename(YAA_Archive yaa)
+    C_API_ARCHIVE_CALL(yaa, const char *, nullptr, filename);
 
 
 /** Create a new empty archive */

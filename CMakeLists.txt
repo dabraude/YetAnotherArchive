@@ -4,9 +4,11 @@ project(YetAnotherArchive VERSION 0.1.0)
 include_directories(include)
 include_directories(src)
 
+find_package(OpenSSL)
 
 set(sources
     src/Archive.cpp
+    src/ArchiveEditor.cpp
     src/yaa.cpp
 )
 

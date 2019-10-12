@@ -9,7 +9,7 @@ extern "C" {
 
 typedef void* YAA_Archive; /** an archive */
 
-/** Apart from the creation, all API calls return this enum */
+/** When appropriate all API calls return this enum */
 enum YAA_RESULT {
     YAA_RESULT_WARN     = -1,
     YAA_RESULT_ERROR    =  0,
@@ -18,7 +18,7 @@ enum YAA_RESULT {
 
 /** Create a new empty archive
  *
- * Allocates the appropraite memory, under the hood this returns a pointer to an object
+ * Allocates the appropriate memory, under the hood this returns a pointer to an object
  * 
  * @param filename the name of the archive to edit
  * @returns a new archive or null if there is a problem
@@ -38,18 +38,19 @@ extern enum YAA_RESULT YAA_delete(YAA_Archive yaa);
 
 /** Opens an archive for editing
  *
- *  @param yaa the archive object to store the loaded info
+ *  @param yaa the archive to store the loaded info
+ *  @param mode the mode in which to open the file, "w", "r", or "a"
  *  @returns results of attempting to load
  *      YAA_RESULT_ERROR an exception was raised or the integrity check failed
  *      YAA_RESULT_WARN if the file was already open
  *      YAA_RESULT_SUCCESS file was opened and signature matched or hmac_public_key is NULL
  */
-extern enum YAA_RESULT YAA_open(YAA_Archive yaa);
+extern enum YAA_RESULT YAA_open(YAA_Archive yaa, const char * mode);
 
 
 /** Closes an open archive
  *
- *  @param yaa the archive object to store the loaded info
+ *  @param yaa the archive to store the loaded info
  *  @returns results of attempting to close
  *      YAA_RESULT_ERROR an exception was raised
  *      YAA_RESULT_WARN the file was already closed
@@ -59,10 +60,18 @@ extern enum YAA_RESULT YAA_close(YAA_Archive yaa);
 
 /** Check if an archive is open
  *
- *  @param yaa the archive object to store the loaded info
+ *  @param yaa the archive to check if open
  *  @returns 1 if open
  */
 int YAA_is_open(YAA_Archive yaa);
+
+/** Gets the file name of the archive
+ * 
+ * @param yaa the archive to get the file name of
+ * @returns the filename, or NULL
+ */
+const char * YAA_filename(YAA_Archive yaa);
+
 
 // TODOs
 
