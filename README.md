@@ -1,5 +1,7 @@
 # YetAnotherArchive
-Yet another archive format, mainly made for my own amusement, but please feel free to use
+Yet another archive format, mainly made for my own amusement, but I designed it around being included into other people's software.
+The goal is to have something that could be easy to distribute to customers for say license files, models, game files ... 
+but also something just for keeping things together.
 
 I wanted something that fufills the following:
   * Random access of indiviual files
@@ -9,19 +11,22 @@ I wanted something that fufills the following:
   * Free to use
   * No hard limits on space (in principle)
   * Reference implementation in C++ with C API and Python bindings for it
+  * if no files are in the archive, the entire thing should be text
   
 I'm sure something like this exists already, but I couldn't find it with a 5 second Google.
  
 
-Format specification (`%d` is an integer in ascii `\0` is null termination):
+You may be asking about the last requirement. This is so that an empty archive it could be used a license file
+if all the license info was in the archive header. Thus saving an extra file type.
 
-  * Start of the file small header = `YAA_MAGIC_STRING|%d\0` 
-    - The integer is the file format number
+Format specification:
+
+  * Start of the file magic string and version number `YAA_MAGIC_STRING|1|` where the 1 is the format version number
   
   * End of file (in order from the back, hashes are written in lower case ascii):
     - 32 characters are the `MD5` hash of the entire file other than the last 96 characters
     - 64 the size of the creator signature `HMAC-RSA-SHA256` or 0s for unsigned files, the hash covering the file other than the last 96 characters
-    - A string of the form `\0%d\0` : the size of the file info JSON in ascii
+    - the size of the file info JSON in ascii
     - The file info JSON
     
    * The header (a JSON):
@@ -39,16 +44,16 @@ Each files entry looks like this:
         {
           "name":"file name",
           "size" : 0,
-          "metadata":{},
-          "encryption":{},
-          "compression":{},
-          "recovery":{}
+          "metadata":{
+          }
          }
 ```
 Obviously the `name` and `size` need to be replaced as appropriate.
-The `metadata`, `encryption`, `compression`, and `recorvery` fields are optional but if included can be used to store anything needed to read the file in your system.
+The `metadata` is required but can be empty.
 
 The `MD5` hash show be used for only for an integrity of the data check since it is faster to compute `SHA256`. 
+
+
 
 
 ## Building
