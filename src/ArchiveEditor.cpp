@@ -41,7 +41,6 @@ enum YAA_RESULT ArchiveEditor::write_new(Archive * archive)
 
 void ArchiveEditor::_write_magic_string(std::fstream& archive_file) {
     archive_file << ARCHIVE_MAGIC_STRING;
-    archive_file.put('\0');
 }
     
 
