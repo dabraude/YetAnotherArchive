@@ -3,14 +3,18 @@
 #define SRC_ARCHIVE_HPP_
 
 #include <fstream>
+#include <memory>
 #include <string>
 
-#include "yaa.h" /* for enum YAA_RESULT */
+#include "yaa.h" // for enum YAA_RESULT 
+
+#include "Header.hpp"
 
 namespace YAA {
 
-#define YAA_NUM_SIGNATURE_CHARACTERS 64
-#define YAA_NUM_HASH_CHARACTERS 32
+#define YAA_NUM_SIGNATURE_CHARS 64
+#define YAA_NUM_HASH_CHARS 32
+#define YAA_NUM_FOOTER_CHARS (YAA_NUM_SIGNATURE_CHARS + YAA_NUM_HASH_CHARS)
 
 extern const char ARCHIVE_MAGIC_STRING[];
 
@@ -20,16 +24,8 @@ class Archive {
      */
 
 public:
-    /** Create a new empty archive
-     * 
-     * Allocates the appropraite memory, under the hood this returns a pointer to an object
-     * 
-     * @see YAA_new
-     * 
-     * @param filename the name of the archive to edit
-     * @returns a new archive 
-     */
-    Archive(const char * filename);
+    
+    Archive();
 
     /** Destructor
      * 
@@ -42,11 +38,13 @@ public:
      *  @see YAA_open
      *
      *  @returns results of attempting to load
-     *      YAA_RESULT_ERROR an exception was raised or the integrity check failed
+     *      YAA_RESULT_ERROR an exception was raised or the integrity check
+     *          failed
      *      YAA_RESULT_WARN file was already open
-     *      YAA_RESULT_SUCCESS file was opened and signature matched or hmac_public_key is NULL
+     *      YAA_RESULT_SUCCESS file was opened and signature matched or
+     *          hmac_public_key is NULL
      */
-    enum YAA_RESULT open(bool read_only);
+    enum YAA_RESULT open(const char * filename, bool read_only);
 
     /** Closes an open archive
      *
@@ -73,11 +71,28 @@ public:
      */
     const char * filename() const;
 
+
+    /** Gets the header in JSON format
+     * 
+     * @returns the header of the archive as it stands in JSON format
+     */
+    std::string header_as_json() const;
+
+    // Allow the Header directly modify 
+    friend class Header;
+
 protected:
-    const std::string _filename;
+
+    // flag for marking the file should be treated as read only
     bool  _read_only;
+
+    // filename, if opened with a file
+    std::string _filename;
+    
+    // file stream to use
     std::fstream _file;
 
+    Header _header;
 
 };
 }

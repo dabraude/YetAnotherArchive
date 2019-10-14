@@ -11,14 +11,12 @@
 {                                                                                   \
     if (!Y)                                                                         \
         return error_value;                                                         \
-    try                                                                             \
-    {                                                                               \
+    try {                                                                           \
         auto archive = reinterpret_cast<YAA::Archive*>(Y);                          \
         return_type result = static_cast<return_type>(archive->func(__VA_ARGS__));  \
         return result;                                                              \
     }                                                                               \
-    catch(const std::exception& e)                                                  \
-    {                                                                               \
+    catch(const std::exception& e) {                                                \
         std::cerr << "exception was raised in YAA_ " << #func                       \
             << ": " << e.what() << '\n';                                            \
         return error_value;                                                         \
@@ -26,8 +24,8 @@
 }                                                                                   \
 
 // The functions
-enum YAA_RESULT YAA_open(YAA_Archive yaa, bool read_only)   
-    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, open, read_only);
+enum YAA_RESULT YAA_open(YAA_Archive yaa, const char * filename, bool read_only)   
+    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, open, filename, read_only);
 
 enum YAA_RESULT YAA_close(YAA_Archive yaa)
     C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, close);
@@ -40,11 +38,9 @@ const char * YAA_filename(YAA_Archive yaa)
 
 
 /** Create a new empty archive */
-YAA_Archive YAA_new(const char * filename)
+YAA_Archive YAA_new()
 {
-    if (!filename)
-        return nullptr;
-    auto yaa = new YAA::Archive(filename);
+    auto yaa = new YAA::Archive();
     return yaa;
 }
 

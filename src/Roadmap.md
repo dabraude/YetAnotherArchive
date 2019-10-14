@@ -1,8 +1,17 @@
+# MVP
+
+* MD5 hash
+* Signing
+* Adding / loading file entries
+* Working with string version
+
+
 # Longer term todos:
 
 * C++ reference implementation with C Api
     * Set up testing
     * Set up Doxygen
+    * Linting
     * Get the documentation up
     * Remove required OpenSSL dependency - still leave in support for speed
 

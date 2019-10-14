@@ -6,8 +6,12 @@
 
 namespace YAA {
 
+/** Check if a file is empty
+ *  
+ * @param filename file to check if it empty
+ * @returns true if the file is empty or does not exist
+ */
 bool empty_file(const std::string & filename);
-
 
 }
 
