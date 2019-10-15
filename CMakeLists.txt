@@ -3,6 +3,8 @@ project(YetAnotherArchive VERSION 0.1.0)
 
 # Options
 
+# TODO: simulate small files
+
 set(CJSON_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/thirdparty/cJSON" CACHE STRING
     "Path to cJSON include files")
 set(CJSON_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/thirdparty/cJSON/build" CACHE STRING
@@ -24,16 +26,20 @@ if (cJSON_LIBRARY_NOTFOUND)
 endif()
 message("-- Found cJSON: ${cJSON_LIBRARY}")
 
+find_package(OpenSSL REQUIRED)
+
 include_directories(include)
 include_directories(src)
 include_directories(${cJSON_INCLUDE_PATH})
 
 
-find_package(OpenSSL)
+# YAA_WRITE_BLOCK_SIZE
+
 
 set(sources
     src/Archive.cpp
     src/ArchiveEditor.cpp
+    src/Hash.cpp
     src/Header.cpp
     src/Log.cpp
     src/utils.cpp
@@ -45,6 +51,7 @@ add_library(YetAnotherArchive ${sources})
 add_executable(testexe test.cpp)
 target_link_libraries(testexe YetAnotherArchive)
 target_link_libraries(testexe ${cJSON_LIBRARY})
+target_link_libraries(testexe ${OPENSSL_LIBRARIES})
 
 set_property(TARGET YetAnotherArchive PROPERTY CXX_STANDARD 11)
 

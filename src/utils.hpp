@@ -13,6 +13,8 @@ namespace YAA {
  */
 bool empty_file(const std::string & filename);
 
+std::string hex_dump(const char * bytes, std::size_t num_bytes);
+
 }
 
 #endif // SRC_UTILS_HPP_

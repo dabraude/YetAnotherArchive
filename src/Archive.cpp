@@ -5,6 +5,7 @@
 
 #include "Archive.hpp"
 #include "ArchiveEditor.hpp"
+#include "Log.hpp"
 #include "utils.hpp"
 
 namespace YAA {

@@ -4,6 +4,7 @@
 
 #include "yaa.h"
 #include "Archive.hpp"
+#include "Hash.hpp"
 
 #ifndef YAA_WRITE_BLOCK_SIZE
 #define YAA_WRITE_BLOCK_SIZE 1048576 // 1MB
@@ -20,10 +21,14 @@ class ArchiveEditor
 
 public:
 
+    /** Constructor just to initialise the Hash functions
+     */
+    ArchiveEditor();
+
     /** Write a whole archive to disc
      *
-     * It is important to sign the archive after it has been written. This will
-     * delete any content already in the archive
+     * This will delete any content already in the archive. It is important to
+     * sign the archive after it has been written.
      * 
      * @param archive Archive to write, filename will be retrieved from the
      *      archive
@@ -54,13 +59,18 @@ protected:
     /** Writes a blank signature */
     void _write_blank_signature(std::fstream& archive_file);
 
-    //void _write_integrity_hash(std::fstream& archive_file);
+    void _write_integrity_hash(std::fstream& archive_file);
 
     /** inserts bytesat the current point into the file */
     void _insert_into_file(std::fstream& archive_file,
                             const void * bytes,
                             std::size_t num_bytes);
 
+    /** calculates the hash of the file as it stands */
+    std::string _calculate_integrity_hash(std::fstream& archive_file);
+
+    Hash _sha1;
+    Hash _sha256;
 };
 }
 

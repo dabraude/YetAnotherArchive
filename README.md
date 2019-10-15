@@ -24,8 +24,8 @@ Format specification:
   * Start of the file magic string and version number `YAA_MAGIC_STRING|1|` where the 1 is the format version number
   
   * End of file (in order from the back, hashes are written in lower case ascii):
-    - 32 characters are the `MD5` hash of the entire file other than the last 96 characters
-    - 64 the size of the creator signature `HMAC-RSA-SHA256` or 0s for unsigned files, the hash covering the file other than the last 96 characters
+    - 40 characters are the `SHA1` hash of the entire file other than the last 104 characters
+    - 64 the size of the creator signature `HMAC-RSA-SHA256` or 0s for unsigned files, the hash covering the file other than the last 104 characters
     - the size of the file info JSON in ascii
     - The file info JSON
     

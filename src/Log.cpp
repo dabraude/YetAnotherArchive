@@ -34,7 +34,7 @@ void Log::enable_for(enum LOG_LEVEL level)
 void Log::log(enum LOG_LEVEL level, const std::string& message)
 {
     if (is_enabled_for(level))
-        std::cerr << Log::_level_names[level] << message << std::endl;
+        std::cerr << Log::_level_names[level] << " " << message << std::endl;
 }
 
 void Log::critical(const std::string& message)
