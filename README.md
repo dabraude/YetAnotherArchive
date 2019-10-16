@@ -21,21 +21,22 @@ Thus saving an extra file type, and you can use something like IoT Device shadow
 
 Format specification:
 
-  * Start of the file magic string and version number `YAA_MAGIC_STRING|1|` where the 1 is the format version number
+  * Start of the file magic string and version number `YAA_MAGIC_STRING(1)` where the 1 is the format version number
   
-  * End of file (in order from the back, hashes are written in lower case ascii):
-    - 40 characters are the `SHA1` hash of the entire file other than the last 104 characters
-    - 64 the size of the creator signature `HMAC-RSA-SHA256` or 0s for unsigned files, the hash covering the file other than the last 104 characters
-    - the size of the file info JSON in ascii
-    - The file info JSON
+  * End of file in order from the back, hashes / number etx are written in lower case ascii:
+    - 40 characters are the `SHA1` hash of the entire file other than the signature and the checksum
+    - the size of the signature (decimal)
+    - the signature, must be a valid JSON, but may be empty ie `{}` 
+    - the size of the header JSON (decimal)
+    - The header
     
-   * The header (a JSON):
-    - Anything can be included in the header but it must include the file index, so at a minimum:
-```json
-{
-  "entries": [
-   ]
-}
+   * The header format, must be a valid JSON:
+    - an index of entities in the archive call `entries`, list of strings
+    - other than that anything may be included
+
+The minimal file is thus:
+```
+YAA_MAGIC_STRING(1){}2{}279b3446baf53bd19808b1f980b49425d960e838f
 ```    
 
 Each files entry looks like this:

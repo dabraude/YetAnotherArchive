@@ -38,13 +38,13 @@ public:
      */
     enum YAA_RESULT write(Archive * archive, const char * filename);
 
-    // rewrite header
+    // update header (bool inplace)
 
-    // remove entity
+    // remove entity (bool inplace)
 
-    // insert entity
+    // insert entity (bool inplace)
 
-    // sign
+    // sign 
 
 
 protected:
@@ -55,11 +55,10 @@ protected:
     
     /** Generates the header JSON and writes to the disc */
     void _write_header(Archive * archive, std::fstream& archive_file);
-    
-    /** Writes a blank signature */
-    void _write_blank_signature(std::fstream& archive_file);
 
-    void _write_integrity_hash(std::fstream& archive_file);
+
+    /** writes the checksum to the end of the file */
+    void _write_checksum(std::fstream& archive_file);
 
     /** inserts bytesat the current point into the file */
     void _insert_into_file(std::fstream& archive_file,
@@ -69,8 +68,23 @@ protected:
     /** calculates the hash of the file as it stands */
     std::string _calculate_integrity_hash(std::fstream& archive_file);
 
+    /** sends the archive read or write stream to the start of the header */
+    void _seek_header_start(std::fstream& archive_file, bool read_stream);
+
+    /** sends the archive read or write stream to the start of the signature */
+    void _seek_signature_start(std::fstream& archive_file, bool read_stream);
+
+    /** sends the archive read or write stream to the start of the checksum */
+    void _seek_checksum_start(std::fstream& archive_file, bool read_stream);
+
+    /** moves the read / write stream */
+    void _seek_stream(std::fstream& archive_file, std::size_t move_size,
+                        std::streampos old_read_pos, bool read_stream);
+
+    /** determines the size of the next JSON in the read stream */
+    std::size_t _json_size(std::fstream& archive_file);
+
     Hash _sha1;
-    Hash _sha256;
 };
 }
 

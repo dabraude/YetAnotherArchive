@@ -10,7 +10,7 @@
 
 namespace YAA {
 
-extern const char ARCHIVE_MAGIC_STRING[] = "YAA_MAGIC_STRING|1|";
+extern const char ARCHIVE_MAGIC_STRING[] = "YAA_MAGIC_STRING(1)";
 
 Archive::Archive() : 
     _header(const_cast<Archive*>(this))

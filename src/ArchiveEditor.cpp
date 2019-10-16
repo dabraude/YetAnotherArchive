@@ -6,18 +6,18 @@
 #include "Archive.hpp"
 #include "ArchiveEditor.hpp"
 #include "Log.hpp"
+#include "utils.hpp"
 
 namespace YAA {
 
-ArchiveEditor::ArchiveEditor() :
-    _sha1("SHA1"),
-    _sha256(YAA_HASH_SHA256)
-{}
+static const char * _blank_json = "{}2";
+
+ArchiveEditor::ArchiveEditor() : _sha1("SHA1") {};
 
 enum YAA_RESULT ArchiveEditor::write(Archive * archive, const char * filename)
 {
     Log log;
-    log.debug("creating a new archive file");
+    log.info("creating a new archive file");
     if (archive->is_open()) {
         log.error("creating a new archive file");
         return YAA_RESULT_ERROR;
@@ -41,21 +41,22 @@ enum YAA_RESULT ArchiveEditor::write(Archive * archive, const char * filename)
     }
 
     _write_magic_string(archive_file);
-    // write the objects
-    _write_header(archive, archive_file);
 
-    // fill in zeros so the file is the right length for the hash function
-    for (int i = 0; i < YAA_NUM_FOOTER_CHARS; i++)
-        archive_file << "0";
-    
-    // _write_blank_signature(archive_file);
-    _write_integrity_hash(archive_file);
+    // TODO: write the objects
+
+    // fill in the minimal header, signature & checksum size
+    archive_file << _blank_json; // header
+    archive_file << _blank_json; // signature
+    for (int i = 0; i < YAA_NUM_CHECKSUM_CHARS; i++)
+        archive_file << ".";
+    _write_header(archive, archive_file);
 
     return YAA_RESULT_SUCCESS;
 }
 
 
-void ArchiveEditor::_write_magic_string(std::fstream& archive_file) {
+void ArchiveEditor::_write_magic_string(std::fstream& archive_file)
+{
     Log log;
     log.debug("writing magic string");
     archive_file << ARCHIVE_MAGIC_STRING;
@@ -67,44 +68,92 @@ void ArchiveEditor::_write_header(Archive * archive,
 {
     Log log;
     log.debug("writing header to file");
-    // archive_file.seekp(-YAA_NUM_FOOTER_CHARS, std::ios_base::end);
+    archive_file.clear();
+
+    _seek_header_start(archive_file, false);
+
     std::string header_json = archive->header_as_json();
     archive_file << header_json;
     archive_file << header_json.length();
-}
 
-
-void ArchiveEditor::_write_blank_signature(std::fstream& archive_file)
-{
-    Log log;
-    log.debug("writing blank signature");
-    char blank[YAA_NUM_SIGNATURE_CHARS+1];
-    for (int i = 0; i < YAA_NUM_SIGNATURE_CHARS; i++)
-        blank[i] = '0';
-    blank[YAA_NUM_SIGNATURE_CHARS] = '\0';
+    // this has invalidated the sigature and checksum so blank them out
+    archive_file << _blank_json;
+    for (int i = 0; i < YAA_NUM_CHECKSUM_CHARS; i++)
+        archive_file << ".";
+    while(!archive_file.eof())
+        archive_file.put('\0');
+    
     archive_file.clear();
-    archive_file.seekp(-YAA_NUM_FOOTER_CHARS, std::ios_base::end);
-    archive_file.write(blank, YAA_NUM_SIGNATURE_CHARS); 
 }
 
 
-void ArchiveEditor::_write_integrity_hash(std::fstream& archive_file)
+void ArchiveEditor::_seek_stream(
+    std::fstream& archive_file,
+    std::size_t move_size,
+    std::streampos old_read_pos,
+    bool read_stream)
 {
-    Log log;
-    log.debug("writing integrity hash");
+    if (read_stream) {
+        archive_file.seekg(move_size, std::ios_base::cur);
+    }
+    else {
+        archive_file.seekp(archive_file.tellg());
+        archive_file.seekp(move_size, std::ios_base::cur);
+        archive_file.seekg(old_read_pos);
+    }
+}
+
+
+void ArchiveEditor::_seek_header_start(std::fstream& archive_file,
+                                        bool read_stream)
+{
+    auto old_read_pos = archive_file.tellg();
+    _seek_signature_start(archive_file, true);
+    size_t header_size = _json_size(archive_file);
+    _seek_stream(archive_file, -header_size, old_read_pos, read_stream);
+}
+
+
+void ArchiveEditor::_seek_signature_start(std::fstream& archive_file,
+                                            bool read_stream)
+{
+    auto old_read_pos = archive_file.tellg();
+    _seek_checksum_start(archive_file, true);
+    size_t signature_size = _json_size(archive_file);
+    _seek_stream(archive_file, -signature_size, old_read_pos, read_stream);
+}
+
+
+void ArchiveEditor::_seek_checksum_start(std::fstream& archive_file,
+                                            bool read_stream)
+{
+    auto old_read_pos = archive_file.tellg();
+    archive_file.seekg(1, std::ios_base::end);
+
+    // we pad with '\0' at the end of files being modified in place
+    while (!archive_file.eof() && archive_file.peek() == '\0')
+        archive_file.seekg(-1, std::ios_base::cur);
+
+    constexpr std::size_t num_checksum_chars = YAA_NUM_CHECKSUM_CHARS;
+    _seek_stream(archive_file, -num_checksum_chars, old_read_pos, read_stream);
+}
+
+
+void ArchiveEditor::_write_checksum(std::fstream& archive_file)
+{
+    Log().debug("writing integrity hash");
+    archive_file.clear();
     std::string hash = _calculate_integrity_hash(archive_file);
-
-    archive_file.clear();
-    archive_file.seekp(-YAA_NUM_HASH_CHARS, std::ios_base::end);
+    _seek_checksum_start(archive_file, false);
     archive_file << hash;
 }
 
 
 std::string ArchiveEditor::_calculate_integrity_hash(std::fstream& archive_file)
 {
-    if (YAA_NUM_HASH_CHARS != _sha1.num_digest_chars()) {
+    if (YAA_NUM_CHECKSUM_CHARS != _sha1.num_digest_chars()) {
         std::string msg = "digest should have ";
-        msg += std::to_string(YAA_NUM_HASH_CHARS);
+        msg += std::to_string(YAA_NUM_CHECKSUM_CHARS);
         msg += " characters, but has ";
         msg += std::to_string(_sha1.num_digest_chars());
         Log().critical(msg);
@@ -114,22 +163,23 @@ std::string ArchiveEditor::_calculate_integrity_hash(std::fstream& archive_file)
     _sha1.reset();
     char file_data[YAA_WRITE_BLOCK_SIZE+1];
     std::size_t message_sz;
-    archive_file.seekg(-YAA_NUM_FOOTER_CHARS, std::ios_base::end);
+
+    archive_file.clear();
+    _seek_checksum_start(archive_file, false);
     auto body_end = archive_file.tellg();
+    
     archive_file.seekg(0, std::ios_base::beg);
+    
     while (!archive_file.eof()) {
         archive_file.read(file_data, YAA_WRITE_BLOCK_SIZE);
         message_sz = archive_file.gcount();
 
         if (archive_file.eof()) {
-            if (message_sz > YAA_NUM_FOOTER_CHARS) {
-                message_sz -= YAA_NUM_FOOTER_CHARS;
-            }
-            else {
-                break;
-            }
+            archive_file.clear();
+            archive_file.seekg(0, std::ios_base::end);
         }
-        else if (archive_file.tellg() > body_end) {
+
+        if (archive_file.tellg() > body_end) {
             std::size_t num_passed = archive_file.tellg() - body_end;
             if (num_passed >= message_sz)
                 break;
@@ -145,6 +195,7 @@ std::string ArchiveEditor::_calculate_integrity_hash(std::fstream& archive_file)
 
     return _sha1.finish();
 }
+
 
 /** inserts stuff into an existing file */
 void ArchiveEditor::_insert_into_file(std::fstream& archive_file,
@@ -194,6 +245,21 @@ void ArchiveEditor::_insert_into_file(std::fstream& archive_file,
         
     archive_file.seekp(out_pos);
     archive_file.write(static_cast<const char*>(bytes), num_bytes);
+}
+
+
+std::size_t ArchiveEditor::_json_size(std::fstream& archive_file)
+{
+    std::size_t exp10 = 0;
+    std::size_t size = 0;
+    char digit = '\0';
+    while (!archive_file.eof() && digit != '}') {
+        archive_file.get(digit);
+        int digit_int = digit - '0';
+        size +=  digit_int * pow10(exp10);
+        exp10++;
+    }
+    return size;
 }
 
 

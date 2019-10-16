@@ -34,7 +34,12 @@ std::string hex_dump(const char * bytes, std::size_t num_bytes)
     return out;
 }
 
-
+std::size_t pow10(std::size_t exponent) {
+    std::size_t value = 1;
+    for (; exponent > 0; exponent--)
+        value *= 10;
+    return value;
+}
 
 
 }
