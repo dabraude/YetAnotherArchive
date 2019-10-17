@@ -36,7 +36,7 @@ Format specification:
 
 The minimal file is thus:
 ```
-YAA_MAGIC_STRING(1){}2{}279b3446baf53bd19808b1f980b49425d960e838f
+YAA_MAGIC_STRING(1){}2{}25dda7a6d74ad57464328f99f485bd3404e3d399a
 ```    
 
 Each files entry looks like this:
@@ -51,14 +51,14 @@ Each files entry looks like this:
 ```
 Obviously the `name` and `size` need to be replaced as appropriate. The `metadata` is required but can be empty.
 
-The `MD5` hash show be used for only for an integrity of the data check since it is faster to compute `SHA256`. 
-
-
+The `SHA1` hash show be used for only for an checksum of the data check and is used because the signatures takes longer to calculate. 
 
 
 ## Building
 
-init & build the submodules (cJSON &  )
+requires the openssl developement libraries
+
+init & build the submodules (cJSON)
 
 This will be updated if I think of anything else.
 
@@ -66,7 +66,3 @@ This will be updated if I think of anything else.
 ## Development
 
 Use PEP-7 coding style
-
-
-
-   

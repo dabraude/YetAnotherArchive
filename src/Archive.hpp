@@ -23,49 +23,22 @@ class Archive {
 
 public:
     
+    /** Constructor initialises internal variables */
     Archive();
 
-    /** Destructor
-     * 
-     * will close the archive if it is open
-     */
-    ~Archive();
-
-    /** Opens an archive for editing
-     * 
-     *  @see YAA_open
+    /** Writes an archive to disc
      *
-     *  @returns results of attempting to load
-     *      YAA_RESULT_ERROR an exception was raised or the integrity check
-     *          failed
-     *      YAA_RESULT_WARN file was already open
-     *      YAA_RESULT_SUCCESS file was opened and signature matched or
-     *          hmac_public_key is NULL
-     */
-    enum YAA_RESULT open(const char * filename, bool read_only);
-
-    /** Closes an open archive
-     *
-     *  @see YAA_close
-     * 
-     *  @returns results of attempting to close
+     * @param filename where to save the archive
+     *  @returns results of attempting to write
      *      YAA_RESULT_ERROR an exception was raised
-     *      YAA_RESULT_WARN the file was already closed
-     *      YAA_RESULT_SUCCESS file was closed successfully
+     *      YAA_RESULT_SUCCESS file was successfully written to disc
      */
-    enum YAA_RESULT close();
+    enum YAA_RESULT write(const char * filename);
 
-    /** Returns if an archive is open
-     * 
-     * @see YAA_is_open
-     * 
-     * @returns true if open
-     */
-    bool is_open() const;
 
     /** File name of the archive
      * 
-     * @returns the file name of archive.
+     * @returns the file name of archive, or NULL if not opened from disc
      */
     const char * filename() const;
 
@@ -75,6 +48,7 @@ public:
      * @returns the header of the archive as it stands in JSON format
      */
     std::string header_as_json() const;
+
 
     // Allow the Header directly modify 
     friend class Header;
@@ -87,11 +61,7 @@ protected:
     // filename, if opened with a file
     std::string _filename;
     
-    // file stream to use
-    std::fstream _file;
-
     Header _header;
-
 };
 }
 

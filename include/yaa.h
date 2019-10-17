@@ -38,43 +38,22 @@ extern YAA_Archive YAA_new();
 extern enum YAA_RESULT YAA_delete(YAA_Archive yaa);
 
 
-/** Opens an archive for editing
+/** Writes an archive to disc
  *
  *  @param yaa the archive to store the loaded info
-  * @param filename the name of the archive to edit
- *  @param read_only if true then editing of the file is not allowed
- *  @returns results of attempting to load
- *      YAA_RESULT_ERROR an exception was raised or the integrity check failed
- *      YAA_RESULT_WARN if the file was already open
- *      YAA_RESULT_SUCCESS file was opened and signature matched or
- *          hmac_public_key is NULL
- */
-extern enum YAA_RESULT YAA_open(YAA_Archive yaa,
-                                const char * filename,
-                                bool read_only);
-
-
-/** Closes an open archive
- *
- *  @param yaa the archive to store the loaded info
- *  @returns results of attempting to close
+  * @param filename where to save the archive
+ *  @returns results of attempting to write
  *      YAA_RESULT_ERROR an exception was raised
- *      YAA_RESULT_WARN the file was already closed
- *      YAA_RESULT_SUCCESS file was closed successfully
+ *      YAA_RESULT_SUCCESS file was successfully written to disc
  */
-extern enum YAA_RESULT YAA_close(YAA_Archive yaa);
+extern enum YAA_RESULT YAA_write(YAA_Archive yaa,
+                                const char * filename);
 
-/** Check if an archive is open
- *
- *  @param yaa the archive to check if open
- *  @returns 1 if open
- */
-int YAA_is_open(YAA_Archive yaa);
 
 /** Gets the file name of the archive
  * 
  * @param yaa the archive to get the file name of
- * @returns the filename, or NULL
+ * @returns the filename, or NULL if a memory only archive
  */
 const char * YAA_filename(YAA_Archive yaa);
 

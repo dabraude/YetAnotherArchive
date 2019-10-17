@@ -3,6 +3,7 @@
 #define SRC_HEADER_HPP_
 
 #include <string>
+#include <cJSON.h>
 
 #include "class_defines.hpp" // forward definitions of classes
 
@@ -13,6 +14,8 @@ class Header
 public:
     Header(Archive* archive);
 
+    ~Header();
+    
     // parse_file();
     // parse_string();
 
@@ -23,6 +26,9 @@ protected:
 
     /** back pointer to the archive */
     Archive* _archive;
+
+    /** anything not in the */
+    cJSON * _extra;
 
 };
 }

@@ -24,14 +24,8 @@
 }                                                                                   \
 
 // The functions
-enum YAA_RESULT YAA_open(YAA_Archive yaa, const char * filename, bool read_only)   
-    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, open, filename, read_only);
-
-enum YAA_RESULT YAA_close(YAA_Archive yaa)
-    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, close);
-
-int YAA_is_open(YAA_Archive yaa)
-    C_API_ARCHIVE_CALL(yaa, int, false, is_open);
+enum YAA_RESULT YAA_write(YAA_Archive yaa, const char * filename)   
+    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, write, filename);
 
 const char * YAA_filename(YAA_Archive yaa)
     C_API_ARCHIVE_CALL(yaa, const char *, nullptr, filename);

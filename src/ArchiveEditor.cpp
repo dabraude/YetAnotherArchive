@@ -18,12 +18,9 @@ enum YAA_RESULT ArchiveEditor::write(Archive * archive, const char * filename)
 {
     Log log;
     log.info("creating a new archive file");
-    if (archive->is_open()) {
-        log.error("creating a new archive file");
-        return YAA_RESULT_ERROR;
-    }
-    
+   
     std::fstream archive_file;
+
     // we need the file to exist so we can open it for reading
     archive_file.open(filename, std::ios::out | std::ios::binary);
     if (!archive_file.is_open()) {
@@ -59,6 +56,8 @@ void ArchiveEditor::_write_magic_string(std::fstream& archive_file)
 {
     Log log;
     log.debug("writing magic string");
+    archive_file.clear();
+    archive_file.seekp(0, std::ios::beg);
     archive_file << ARCHIVE_MAGIC_STRING;
 }
 
@@ -76,66 +75,71 @@ void ArchiveEditor::_write_header(Archive * archive,
     archive_file << header_json;
     archive_file << header_json.length();
 
+    // TODO: truncate the file here
+
     // this has invalidated the sigature and checksum so blank them out
     archive_file << _blank_json;
     for (int i = 0; i < YAA_NUM_CHECKSUM_CHARS; i++)
         archive_file << ".";
-    while(!archive_file.eof())
-        archive_file.put('\0');
-    
-    archive_file.clear();
+
+    _write_checksum(archive_file);
 }
 
 
-void ArchiveEditor::_seek_stream(
-    std::fstream& archive_file,
-    std::size_t move_size,
-    std::streampos old_read_pos,
-    bool read_stream)
+void ArchiveEditor::_seek_stream(std::fstream& archive_file, int move,
+                                    bool read_stream, std::streampos read_pos)
 {
     if (read_stream) {
-        archive_file.seekg(move_size, std::ios_base::cur);
+        archive_file.seekg(move, std::ios::cur);
     }
     else {
         archive_file.seekp(archive_file.tellg());
-        archive_file.seekp(move_size, std::ios_base::cur);
-        archive_file.seekg(old_read_pos);
+        archive_file.seekp(move, std::ios::cur);
+        archive_file.seekg(read_pos);
     }
+}
+
+
+void ArchiveEditor::_seek_json_start(std::fstream& archive_file,
+                                        bool read_stream)
+{
+    auto read_pos = archive_file.tellg();
+    if (read_stream)
+        archive_file.seekg(-1, std::ios::cur);
+    else
+        archive_file.seekp(-1, std::ios::cur);
+    if (!read_stream)
+        archive_file.seekg(archive_file.tellp());
+    int move_size = _json_size(archive_file) - 1; 
+    if (!read_stream)
+        archive_file.seekp(archive_file.tellg());
+    _seek_stream(archive_file, -move_size, read_pos, read_stream);
 }
 
 
 void ArchiveEditor::_seek_header_start(std::fstream& archive_file,
                                         bool read_stream)
 {
-    auto old_read_pos = archive_file.tellg();
-    _seek_signature_start(archive_file, true);
-    size_t header_size = _json_size(archive_file);
-    _seek_stream(archive_file, -header_size, old_read_pos, read_stream);
+    _seek_signature_start(archive_file, read_stream);
+    _seek_json_start(archive_file, read_stream);
 }
 
 
 void ArchiveEditor::_seek_signature_start(std::fstream& archive_file,
                                             bool read_stream)
 {
-    auto old_read_pos = archive_file.tellg();
-    _seek_checksum_start(archive_file, true);
-    size_t signature_size = _json_size(archive_file);
-    _seek_stream(archive_file, -signature_size, old_read_pos, read_stream);
+    _seek_checksum_start(archive_file, read_stream);
+    _seek_json_start(archive_file, read_stream);
 }
 
 
 void ArchiveEditor::_seek_checksum_start(std::fstream& archive_file,
                                             bool read_stream)
 {
-    auto old_read_pos = archive_file.tellg();
-    archive_file.seekg(1, std::ios_base::end);
-
-    // we pad with '\0' at the end of files being modified in place
-    while (!archive_file.eof() && archive_file.peek() == '\0')
-        archive_file.seekg(-1, std::ios_base::cur);
-
-    constexpr std::size_t num_checksum_chars = YAA_NUM_CHECKSUM_CHARS;
-    _seek_stream(archive_file, -num_checksum_chars, old_read_pos, read_stream);
+    if (read_stream)
+        archive_file.seekg(-YAA_NUM_CHECKSUM_CHARS, std::ios::end);
+    else
+        archive_file.seekp(-YAA_NUM_CHECKSUM_CHARS, std::ios::end);
 }
 
 
@@ -165,10 +169,10 @@ std::string ArchiveEditor::_calculate_integrity_hash(std::fstream& archive_file)
     std::size_t message_sz;
 
     archive_file.clear();
-    _seek_checksum_start(archive_file, false);
+    _seek_signature_start(archive_file, false);
     auto body_end = archive_file.tellg();
     
-    archive_file.seekg(0, std::ios_base::beg);
+    archive_file.seekg(0, std::ios::beg);
     
     while (!archive_file.eof()) {
         archive_file.read(file_data, YAA_WRITE_BLOCK_SIZE);
@@ -176,7 +180,7 @@ std::string ArchiveEditor::_calculate_integrity_hash(std::fstream& archive_file)
 
         if (archive_file.eof()) {
             archive_file.clear();
-            archive_file.seekg(0, std::ios_base::end);
+            archive_file.seekg(0, std::ios::end);
         }
 
         if (archive_file.tellg() > body_end) {
@@ -210,7 +214,7 @@ void ArchiveEditor::_insert_into_file(std::fstream& archive_file,
         file_data[i] = 'q';
 
     // add enough characters to the end of the file
-    archive_file.seekp(0, std::ios_base::end);
+    archive_file.seekp(0, std::ios::end);
     std::size_t n = 0;
     for (std::size_t wrote = 0; wrote < num_bytes; wrote += n) {
         n = num_bytes - wrote;
@@ -219,7 +223,7 @@ void ArchiveEditor::_insert_into_file(std::fstream& archive_file,
     }
 
     // move enerything in block sizes
-    archive_file.seekg(-num_bytes,  std::ios_base::end);
+    archive_file.seekg(-num_bytes,  std::ios::end);
     bool finished = false;
     while (!finished) {
         int block_sz;
@@ -231,16 +235,16 @@ void ArchiveEditor::_insert_into_file(std::fstream& archive_file,
         else 
             finished = true;
 
-        archive_file.seekg(-block_sz, std::ios_base::cur);
+        archive_file.seekg(-block_sz, std::ios::cur);
         archive_file.read(file_data, block_sz);
-        archive_file.seekg(-block_sz, std::ios_base::cur);
+        archive_file.seekg(-block_sz, std::ios::cur);
 
         archive_file.seekp(archive_file.tellg());
-        archive_file.seekp(num_bytes, std::ios_base::cur);
+        archive_file.seekp(num_bytes, std::ios::cur);
         archive_file.write(file_data, block_sz);
 
         archive_file.seekg(old_pos);
-        archive_file.seekg(-block_sz, std::ios_base::cur);
+        archive_file.seekg(-block_sz, std::ios::cur);
     }
         
     archive_file.seekp(out_pos);
@@ -252,13 +256,20 @@ std::size_t ArchiveEditor::_json_size(std::fstream& archive_file)
 {
     std::size_t exp10 = 0;
     std::size_t size = 0;
-    char digit = '\0';
-    while (!archive_file.eof() && digit != '}') {
-        archive_file.get(digit);
-        int digit_int = digit - '0';
-        size +=  digit_int * pow10(exp10);
-        exp10++;
+
+    if (archive_file.eof()) {
+        Log().warn("trying to read json size with eof flag set\n");
     }
+
+    char digit = archive_file.peek();
+    while (digit != '}') {
+        int digit_int = digit - '0';
+        size += digit_int * pow10(exp10);
+        exp10++;
+        archive_file.seekg(-1, std::ios::cur);
+        digit = archive_file.peek();
+    };
+
     return size;
 }
 

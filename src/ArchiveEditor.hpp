@@ -56,7 +56,6 @@ protected:
     /** Generates the header JSON and writes to the disc */
     void _write_header(Archive * archive, std::fstream& archive_file);
 
-
     /** writes the checksum to the end of the file */
     void _write_checksum(std::fstream& archive_file);
 
@@ -77,9 +76,22 @@ protected:
     /** sends the archive read or write stream to the start of the checksum */
     void _seek_checksum_start(std::fstream& archive_file, bool read_stream);
 
-    /** moves the read / write stream */
-    void _seek_stream(std::fstream& archive_file, std::size_t move_size,
-                        std::streampos old_read_pos, bool read_stream);
+    /** moves to the start of the next JSON, assumes stream is one past the
+     *  end of the json
+     */
+    void _seek_json_start(std::fstream& archive_file, bool read_stream);
+
+    /** moves the read / write stream relative to the read stream, 
+     * 
+     * @param archive_file stream
+     * @param move the change in the stream
+     * @param read_stream if true moves the read stream otherwise move the
+     *  write stream, relative to the current position of the read stream
+     * @param read_pos if moving the write stream where to send the read stream
+     *  afterwards
+     */
+    void _seek_stream(std::fstream& archive_file, int move, bool read_stream,
+                        std::streampos read_pos);
 
     /** determines the size of the next JSON in the read stream */
     std::size_t _json_size(std::fstream& archive_file);

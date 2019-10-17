@@ -1,9 +1,14 @@
 # MVP
 
-* MD5 hash
-* Signing
-* Adding / loading file entries
-* Working with string version
+* add fields to header 
+    * simple string fields
+    * cjson objects
+    * json string fields
+
+* add entities
+* load entities
+* signing
+* Working with in memory version
 
 
 # Longer term todos:
@@ -13,6 +18,7 @@
     * Set up Doxygen
     * Linting
     * Get the documentation up
+    * Mutex locking for io
     * Remove required OpenSSL dependency - still leave in support for speed
 
 * Python 3 bindings
