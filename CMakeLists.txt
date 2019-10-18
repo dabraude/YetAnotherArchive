@@ -38,7 +38,7 @@ include_directories(${cJSON_INCLUDE_PATH})
 
 set(sources
     src/Archive.cpp
-    src/ArchiveEditor.cpp
+    src/ArchiveFile.cpp
     src/Hash.cpp
     src/Header.cpp
     src/Log.cpp

@@ -34,9 +34,9 @@ std::string Header::to_string() const
         throw std::bad_alloc();
     }
 
-    // entries
-    // auto entries = cJSON_CreateArray();
-    // cJSON_AddItemToObject(headerJSON, "entries", entries);
+    // entities
+    // auto entities = cJSON_CreateArray();
+    // cJSON_AddItemToObject(headerJSON, "entities", entities);
 
     char * json_cstr = cJSON_PrintUnformatted(headerJSON);
     if (!json_cstr) {

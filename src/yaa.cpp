@@ -23,9 +23,15 @@
     }                                                                               \
 }                                                                                   \
 
-// The functions
+// The wrapped API functions
 enum YAA_RESULT YAA_write(YAA_Archive yaa, const char * filename)   
-    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, write, filename);
+    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, write,
+                        filename);
+
+enum YAA_RESULT YAA_load(YAA_Archive yaa, const char * filename,
+                            bool load_entities)   
+    C_API_ARCHIVE_CALL(yaa, enum YAA_RESULT, YAA_RESULT_ERROR, load, filename,
+                        load_entities);
 
 const char * YAA_filename(YAA_Archive yaa)
     C_API_ARCHIVE_CALL(yaa, const char *, nullptr, filename);

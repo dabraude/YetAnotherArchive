@@ -12,7 +12,7 @@
 
 namespace YAA {
 
-class ArchiveEditor
+class ArchiveFile
 {
     /** Edits files on the disk
      * 
@@ -23,7 +23,7 @@ public:
 
     /** Constructor just to initialise the Hash functions
      */
-    ArchiveEditor();
+    ArchiveFile();
 
     /** Write a whole archive to disc
      *

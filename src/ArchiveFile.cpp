@@ -4,7 +4,7 @@
 
 #include "yaa.h"
 #include "Archive.hpp"
-#include "ArchiveEditor.hpp"
+#include "ArchiveFile.hpp"
 #include "Log.hpp"
 #include "utils.hpp"
 
@@ -14,13 +14,15 @@ namespace YAA {
 static const char * _blank_json = "{}2";
 
 
-ArchiveEditor::ArchiveEditor() : _sha1("SHA1") {};
+ArchiveFile::ArchiveFile() : _sha1("SHA1") {};
 
 
-enum YAA_RESULT ArchiveEditor::write(Archive * archive, const char * filename)
+enum YAA_RESULT ArchiveFile::write(Archive * archive, const char * filename)
 {
     Log log;
-    log.info("creating a new archive file");
+    
+    if (empty_file(filename))
+        log.info("creating a new archive file");
    
     std::fstream archive_file;
 
@@ -55,7 +57,7 @@ enum YAA_RESULT ArchiveEditor::write(Archive * archive, const char * filename)
 }
 
 
-void ArchiveEditor::_write_magic_string(std::fstream& archive_file)
+void ArchiveFile::_write_magic_string(std::fstream& archive_file)
 {
     Log log;
     log.debug("writing magic string");
@@ -68,7 +70,7 @@ void ArchiveEditor::_write_magic_string(std::fstream& archive_file)
 // _write_object();
 
 
-void ArchiveEditor::_write_header(Archive * archive,
+void ArchiveFile::_write_header(Archive * archive,
                                     std::fstream& archive_file)
 {
     Log log;
@@ -91,7 +93,7 @@ void ArchiveEditor::_write_header(Archive * archive,
     _write_checksum(archive_file);
 }
 
-void ArchiveEditor::_write_checksum(std::fstream& archive_file)
+void ArchiveFile::_write_checksum(std::fstream& archive_file)
 {
     Log().debug("writing integrity hash");
     archive_file.clear();
@@ -101,7 +103,7 @@ void ArchiveEditor::_write_checksum(std::fstream& archive_file)
 }
 
 
-std::size_t ArchiveEditor::_seek_header_start(std::fstream& archive_file,
+std::size_t ArchiveFile::_seek_header_start(std::fstream& archive_file,
                                         bool read_stream)
 {
     _seek_signature_start(archive_file, read_stream);
@@ -109,7 +111,7 @@ std::size_t ArchiveEditor::_seek_header_start(std::fstream& archive_file,
 }
 
 
-std::size_t ArchiveEditor::_seek_signature_start(std::fstream& archive_file,
+std::size_t ArchiveFile::_seek_signature_start(std::fstream& archive_file,
                                             bool read_stream)
 {
     _seek_checksum_start(archive_file, read_stream);
@@ -117,7 +119,7 @@ std::size_t ArchiveEditor::_seek_signature_start(std::fstream& archive_file,
 }
 
 
-void ArchiveEditor::_seek_checksum_start(std::fstream& archive_file,
+void ArchiveFile::_seek_checksum_start(std::fstream& archive_file,
                                             bool read_stream)
 {
     if (read_stream)
@@ -127,7 +129,7 @@ void ArchiveEditor::_seek_checksum_start(std::fstream& archive_file,
 }
 
 
-std::size_t ArchiveEditor::_seek_json_start(std::fstream& archive_file,
+std::size_t ArchiveFile::_seek_json_start(std::fstream& archive_file,
                                         bool read_stream)
 {
     auto read_pos = archive_file.tellg();
@@ -146,7 +148,7 @@ std::size_t ArchiveEditor::_seek_json_start(std::fstream& archive_file,
 }
 
 
-void ArchiveEditor::_seek_stream(std::fstream& archive_file, int move,
+void ArchiveFile::_seek_stream(std::fstream& archive_file, int move,
                                     bool read_stream, std::streampos read_pos)
 {
     if (read_stream) {
@@ -160,7 +162,7 @@ void ArchiveEditor::_seek_stream(std::fstream& archive_file, int move,
 }
 
 
-std::string ArchiveEditor::_calculate_checksum(std::fstream& archive_file)
+std::string ArchiveFile::_calculate_checksum(std::fstream& archive_file)
 {
     if (YAA_NUM_CHECKSUM_CHARS != _sha1.num_digest_chars()) {
         std::string msg = "digest should have ";
@@ -208,7 +210,7 @@ std::string ArchiveEditor::_calculate_checksum(std::fstream& archive_file)
 }
 
 
-std::size_t ArchiveEditor::_json_size(std::fstream& archive_file)
+std::size_t ArchiveFile::_json_size(std::fstream& archive_file)
 {
     std::size_t exp10 = 0;
     std::size_t size = 0;
@@ -230,7 +232,7 @@ std::size_t ArchiveEditor::_json_size(std::fstream& archive_file)
 }
 
 /** inserts stuff into an existing file */
-void ArchiveEditor::_insert_into_file(std::fstream& archive_file,
+void ArchiveFile::_insert_into_file(std::fstream& archive_file,
                                         const void * bytes,
                                         std::size_t num_bytes)
 {

@@ -46,8 +46,18 @@ extern enum YAA_RESULT YAA_delete(YAA_Archive yaa);
  *      YAA_RESULT_ERROR an exception was raised
  *      YAA_RESULT_SUCCESS file was successfully written to disc
  */
-extern enum YAA_RESULT YAA_write(YAA_Archive yaa,
-                                const char * filename);
+extern enum YAA_RESULT YAA_write(YAA_Archive yaa, const char * filename);
+
+
+/** Loads an existing archive file
+ * 
+ * @param yaa archive to load into
+ * @param filename which archive to load
+ * @param load_entities if true will load all entities in the archive
+ *          into memory
+  */ 
+extern enum YAA_RESULT YAA_load(YAA_Archive yaa, const char * filename,
+                                bool load_entities);
 
 
 /** Gets the file name of the archive
@@ -58,6 +68,7 @@ extern enum YAA_RESULT YAA_write(YAA_Archive yaa,
 const char * YAA_filename(YAA_Archive yaa);
 
 
+
 // TODOs
 
 // functions:
@@ -65,9 +76,8 @@ const char * YAA_filename(YAA_Archive yaa);
 //  YAA_remove_object
 //  YAA_retrieve_object
 //  YAA_verify_creator
-//  YAA_verify_integrity
+//  YAA_verify_checksum
 //  YAA_sign
-//  YAA_save
 //  YAA_parse_string
 
 // general

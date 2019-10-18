@@ -31,7 +31,7 @@ Format specification:
     - The header
     
    * The header format, must be a valid JSON:
-    - an index of entities in the archive call `entries`, list of strings
+    - an index of entities in the archive call `entities`, list of strings
     - other than that anything may be included
 
 The minimal file is thus:

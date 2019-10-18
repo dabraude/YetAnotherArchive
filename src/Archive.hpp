@@ -22,18 +22,34 @@ class Archive {
      */
 
 public:
-    
+
+
+    // External API
+
+
     /** Constructor initialises internal variables */
     Archive();
 
     /** Writes an archive to disc
      *
      * @param filename where to save the archive
-     *  @returns results of attempting to write
+     * @returns results of attempting to write
      *      YAA_RESULT_ERROR an exception was raised
      *      YAA_RESULT_SUCCESS file was successfully written to disc
      */
     enum YAA_RESULT write(const char * filename);
+
+
+    /** Loads an existing archive file
+     * 
+     * @param filename which archive to load
+     * @param load_entities if true will load all entities in the archive
+     *          into memory
+     * @returns the result of loading the file
+     *          YAA_RESULT_ERROR if not a YAA file, checksum does not match
+     *          YAA_RESULE_SUCESSS if no problems loading the file
+     */ 
+    enum YAA_RESULT load(const char * filename, bool load_entities);
 
 
     /** File name of the archive
@@ -48,6 +64,9 @@ public:
      * @returns the header of the archive as it stands in JSON format
      */
     std::string header_as_json() const;
+
+
+
 
 
     // Allow the Header directly modify 
