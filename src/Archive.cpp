@@ -72,11 +72,5 @@ const char * Archive::filename() const
 }
 
 
-std::string Archive::header_as_json() const
-{
-    return _header.to_string();
-}
-
-
 }
 

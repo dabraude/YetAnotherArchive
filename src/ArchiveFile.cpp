@@ -79,7 +79,7 @@ void ArchiveFile::_write_header(Archive * archive,
 
     _seek_header_start(archive_file, false);
 
-    std::string header_json = archive->header_as_json();
+    std::string header_json = archive->_header.to_string();
     archive_file << header_json;
     archive_file << header_json.length();
 

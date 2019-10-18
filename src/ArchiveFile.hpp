@@ -3,7 +3,7 @@
 #define SRC_ARCHIVE_EDITOR_HPP_
 
 #include "yaa.h"
-#include "Archive.hpp"
+#include "class_defines.hpp"
 #include "Hash.hpp"
 
 #ifndef YAA_WRITE_BLOCK_SIZE

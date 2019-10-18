@@ -8,6 +8,7 @@
 
 #include "yaa.h" // for enum YAA_RESULT 
 
+#include "ArchiveFile.hpp"
 #include "Header.hpp"
 
 namespace YAA {
@@ -59,18 +60,9 @@ public:
     const char * filename() const;
 
 
-    /** Gets the header in JSON format
-     * 
-     * @returns the header of the archive as it stands in JSON format
-     */
-    std::string header_as_json() const;
-
-
-
-
-
-    // Allow the Header directly modify 
+    // Allows underlying classes to work without creating extra interfaces
     friend class Header;
+    friend class ArchiveFile;
 
 protected:
 
