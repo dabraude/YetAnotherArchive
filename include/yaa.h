@@ -5,11 +5,14 @@
 
 #include <stdbool.h>
 
+#include <cJSON.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
 typedef void* YAA_Archive; /** an archive */
+typedef struct YAA_Entity YAA_Entity; /** entities in the archive */
 
 /** When appropriate all API calls return this enum */
 enum YAA_RESULT {
@@ -68,6 +71,21 @@ extern enum YAA_RESULT YAA_load(YAA_Archive yaa, const char * filename,
 const char * YAA_filename(YAA_Archive yaa);
 
 
+struct YAA_Entity
+{
+/**
+ * The data in the archive 
+ */
+    const char *  name;       /** name of the entity in the archive */
+    char *        data;       /** data payload */
+    size_t        data_size;  /** the amount of data */
+    cJSON *       meta_data;  /** meta data of the entity */
+    long int      file_start; /** position relative to start of file */
+};
+
+
+// New entity
+// Delete entity
 
 // TODOs
 
